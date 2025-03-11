@@ -19,6 +19,8 @@ Route::get('/', function () {
 Route::get('/mvp', [MVPController::class, 'index'])->name('mvp');
 Route::get('/users', [MvpController::class, 'getUsers']);
 Route::post('/users', [MVPController::class, 'addUser']);
+Route::delete('/users/{id}', [MVPController::class, 'deleteUser']);
+
 
 
 Route::middleware(['auth'])->group(function () {

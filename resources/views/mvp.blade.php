@@ -9,7 +9,7 @@
     <input type="text" id="telefono" placeholder="Telefono" required>
     <input type="hidden" id="latitud">
     <input type="hidden" id="longitud">
-    <input type="hidden" id="email" placeholder="Email">
+    <input type="hidden" id="email">
     <button type="submit">Añadir Usuario</button>
 </form>
 
@@ -39,7 +39,15 @@
                     userList.innerHTML = "";
                     data.forEach(user => {
                         const li = document.createElement("li");
-                        li.textContent = `${user.nombre} - ${user.telefono}`;
+                        li.textContent = `${user.nombre} - ${user.telefono} `;
+
+                        const deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Eliminar";
+                        deleteButton.onclick = function () {
+                            deleteUser(user.id);
+                        };
+
+                        li.appendChild(deleteButton);
                         userList.appendChild(li);
                     });
                 })
@@ -58,9 +66,9 @@
             fetch("/users", {
                 method: "POST",
                 headers: { 
-                "Content-Type": "application/json", 
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"  // Laravel requiere esto
-            },
+                    "Content-Type": "application/json", 
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"  
+                },
                 body: JSON.stringify({ nombre, email, telefono, direccion, latitud, longitud })
             })
             .then(response => response.json())
@@ -71,10 +79,23 @@
             .catch(error => console.error("Error al añadir usuario:", error));
         }
 
+        function deleteUser(userId) {
+            fetch(`/users/${userId}`, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                }
+            })
+            .then(response => response.json())
+            .then(() => loadUsers())
+            .catch(error => console.error("Error al eliminar usuario:", error));
+        }
+
         document.getElementById("addUserForm").addEventListener("submit", addUser);
         loadUsers();
     });
 </script>
+
 <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&libraries=places&callback=initAutocomplete" async defer></script>
 
 @endsection

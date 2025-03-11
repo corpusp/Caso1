@@ -11,9 +11,11 @@ use Illuminate\Support\Facades\Hash;
 
 class MVPController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function deleteUser($id) {
+        $usuario = Usuario::findOrFail($id);
+        $usuario->delete();
+        return response()->json(['message' => 'Usuario eliminado correctamente']);
+    }
     public function getUsers()
     {
         return response()->json(Usuario::all());
