@@ -20,6 +20,12 @@
 <div id="map" style="width: 100%; height: 500px;"></div>
 <button id="calculateRoute">Calcular Ruta Óptima</button>
 
+<h2>Resultados de la Ruta</h2>
+<div id="routeResults">
+    <ul id="routeDetails"></ul>
+</div>
+
+
 <script>
     let map, directionsService, directionsRenderer, autocomplete;
     const origin = { lat: -12.0464, lng: -77.0428 };
@@ -155,32 +161,73 @@
     
 
     function calculateOptimalRoute() {
-        fetch("/users")
-            .then(response => response.json())
-            .then(data => {
-                const waypoints = data.map(user => ({
-                    location: new google.maps.LatLng(user.latitud, user.longitud),
-                    stopover: true
-                }));
+    fetch("/users")
+        .then(response => response.json())
+        .then(data => {
+            if (data.length === 0) {
+                alert("No hay usuarios registrados.");
+                return;
+            }
 
-                const request = {
-                    origin: origin,
-                    destination: destination,
-                    waypoints: waypoints,
-                    travelMode: google.maps.TravelMode.DRIVING,
-                    optimizeWaypoints: true
-                };
+            const waypoints = data.map(user => ({
+                location: new google.maps.LatLng(user.latitud, user.longitud),
+                stopover: true
+            }));
 
-                directionsService.route(request, function(result, status) {
-                    if (status === google.maps.DirectionsStatus.OK) {
-                        directionsRenderer.setDirections(result);
-                    } else {
-                        console.error("No se pudo calcular la ruta:", status);
-                    }
-                });
-            })
-            .catch(error => console.error("Error al obtener usuarios para la ruta:", error));
-    }
+            const request = {
+                origin: origin,
+                destination: destination,
+                waypoints: waypoints,
+                travelMode: google.maps.TravelMode.DRIVING,
+                optimizeWaypoints: true
+            };
+
+            directionsService.route(request, function(result, status) {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                    showRouteDetails(result, data);
+                } else {
+                    console.error("No se pudo calcular la ruta:", status);
+                }
+            });
+        })
+        .catch(error => console.error("Error al obtener usuarios para la ruta:", error));
+}
+
+function showRouteDetails(result, users) {
+    const routeDetails = document.getElementById("routeDetails");
+    routeDetails.innerHTML = ""; // Limpiar contenido anterior
+
+    const route = result.routes[0];
+    let totalDistance = 0;
+    let totalTime = 0;
+
+    route.legs.forEach((leg, index) => {
+        totalDistance += leg.distance.value; // en metros
+        totalTime += leg.duration.value; // en segundos
+
+        const li = document.createElement("li");
+        const user = users[index] || { nombre: "Destino Final" };
+        
+        li.innerHTML = `
+            <strong>${index + 1}. ${user.nombre}</strong><br>
+            Dirección: ${user.direccion || "N/A"}<br>
+            Distancia: ${leg.distance.text}<br>
+            Tiempo estimado: ${leg.duration.text}
+        `;
+        routeDetails.appendChild(li);
+    });
+
+    // Mostrar distancia y tiempo total
+    const totalInfo = document.createElement("li");
+    totalInfo.innerHTML = `
+        <strong>Total de la ruta:</strong><br>
+        Distancia: ${(totalDistance / 1000).toFixed(2)} km<br>
+        Tiempo estimado: ${(totalTime / 60).toFixed(2)} minutos
+    `;
+    routeDetails.appendChild(totalInfo);
+}
+
 
     document.getElementById("calculateRoute").addEventListener("click", calculateOptimalRoute);
 </script>
