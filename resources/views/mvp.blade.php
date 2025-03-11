@@ -207,11 +207,11 @@ function showRouteDetails(result, users) {
         totalTime += leg.duration.value; // en segundos
 
         const li = document.createElement("li");
-        const user = users[index] || { nombre: "Destino Final" };
+        const user = users[index] ? users[index] : { nombre: "Destino Final", direccion: "Parque de las Aguas" };
         
         li.innerHTML = `
             <strong>${index + 1}. ${user.nombre}</strong><br>
-            Dirección: ${user.direccion || "N/A"}<br>
+            Dirección: ${user.direccion}<br>
             Distancia: ${leg.distance.text}<br>
             Tiempo estimado: ${leg.duration.text}
         `;
@@ -227,6 +227,7 @@ function showRouteDetails(result, users) {
     `;
     routeDetails.appendChild(totalInfo);
 }
+
 
 
     document.getElementById("calculateRoute").addEventListener("click", calculateOptimalRoute);
