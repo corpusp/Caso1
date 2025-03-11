@@ -1,28 +1,69 @@
 @extends('layouts.app')
 
 @section('content')
-<h2>Añadir Usuario</h2>
-<form id="addUserForm">
-    @csrf
-    <input type="text" id="nombre" placeholder="Nombre" required>
-    <input type="text" id="direccion" placeholder="Dirección" required autocomplete="off"> <!-- 🔥 Evita autocompletado del navegador -->
-    <input type="text" id="telefono" placeholder="Teléfono" required>
-    <input type="hidden" id="latitud">
-    <input type="hidden" id="longitud">
-    <input type="hidden" id="email">
-    <button type="submit">Añadir Usuario</button>
-</form>
 
-<h2>Lista de Usuarios</h2>
-<ul id="userList"></ul>
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sección Añadir Usuario -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Añadir Usuario</h5>
+                    <form id="addUserForm">
+                        @csrf
+                        <div class="mb-2">
+                            <input type="text" id="nombre" class="form-control" placeholder="Nombre" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" id="direccion" class="form-control" placeholder="Dirección" required autocomplete="off">
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" id="telefono" class="form-control" placeholder="Teléfono" required>
+                        </div>
+                        <input type="hidden" id="latitud">
+                        <input type="hidden" id="longitud">
+                        <input type="hidden" id="email">
+                        <button type="submit" class="btn btn-primary w-100">Añadir Usuario</button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-<h2>Mapa de Ubicación</h2>
-<div id="map" style="width: 100%; height: 500px;"></div>
-<button id="calculateRoute">Calcular Ruta Óptima</button>
+        <!-- Sección Mapa -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Mapa de Ubicación</h5>
+                    <div id="map" style="width: 100%; height: 300px;"></div>
+                    <button id="calculateRoute" class="btn btn-success w-100 mt-3">Calcular Ruta Óptima</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<h2>Resultados de la Ruta</h2>
-<div id="routeResults">
-    <ul id="routeDetails"></ul>
+    <div class="row mt-3">
+        <!-- Sección Lista de Usuarios -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Lista de Usuarios</h5>
+                    <ul id="userList" class="list-group"></ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección Resultados de la Ruta -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Resultados de la Ruta</h5>
+                    <div id="routeResults">
+                        <ul id="routeDetails" class="list-group"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -83,29 +124,41 @@
     }
 
     function loadUsers() {
-        fetch("/users")
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("userList").innerHTML = "";
-                markers.forEach(marker => marker.setMap(null));
-                markers = [];
+    fetch("/users")
+        .then(response => response.json())
+        .then(data => {
+            const userList = document.getElementById("userList");
+            userList.innerHTML = "";
 
-                addMarker(origin, "Inicio (Centro de Lima)", "green");
-                addMarker(destination, "Destino (Parque de las Aguas)", "blue");
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
 
-                data.forEach(user => {
-                    const li = document.createElement("li");
-                    li.innerHTML = `${user.nombre} - ${user.telefono} 
-                                    <button onclick="deleteUser(${user.id})">Eliminar</button>`;
-                    document.getElementById("userList").appendChild(li);
+            addMarker(origin, "Inicio (Centro de Lima)", "green");
+            addMarker(destination, "Destino (Parque de las Aguas)", "blue");
 
-                    if (user.latitud && user.longitud) {
-                        addMarker({ lat: parseFloat(user.latitud), lng: parseFloat(user.longitud) }, user.nombre);
-                    }
-                });
-            })
-            .catch(error => console.error("Error al cargar usuarios:", error));
-    }
+            data.forEach(user => {
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+                li.innerHTML = `
+                    <div>
+                        <strong>${user.nombre}</strong> <br>
+                        📍 ${user.direccion} <br>
+                        📞 ${user.telefono}
+                    </div>
+                    <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">
+                        Eliminar
+                    </button>
+                `;
+                userList.appendChild(li);
+
+                if (user.latitud && user.longitud) {
+                    addMarker({ lat: parseFloat(user.latitud), lng: parseFloat(user.longitud) }, user.nombre);
+                }
+            });
+        })
+        .catch(error => console.error("Error al cargar usuarios:", error));
+}
 
     function addUser(event) {
         event.preventDefault();
@@ -196,38 +249,40 @@
 
 function showRouteDetails(result, users) {
     const routeDetails = document.getElementById("routeDetails");
-    routeDetails.innerHTML = ""; // Limpiar contenido anterior
+    routeDetails.innerHTML = "";
 
     const route = result.routes[0];
     let totalDistance = 0;
     let totalTime = 0;
 
     route.legs.forEach((leg, index) => {
-        totalDistance += leg.distance.value; // en metros
-        totalTime += leg.duration.value; // en segundos
+        totalDistance += leg.distance.value;
+        totalTime += leg.duration.value;
 
         const li = document.createElement("li");
+        li.className = "list-group-item";
+
         const user = users[index] ? users[index] : { nombre: "Destino Final", direccion: "Parque de las Aguas" };
         
         li.innerHTML = `
-            <strong>${index + 1}. ${user.nombre}</strong><br>
-            Dirección: ${user.direccion}<br>
-            Distancia: ${leg.distance.text}<br>
-            Tiempo estimado: ${leg.duration.text}
+            <strong>🧑 ${index + 1}. ${user.nombre}</strong> <br>
+            📍 <em>${user.direccion}</em> <br>
+            📏 Distancia: <strong>${leg.distance.text}</strong> <br>
+            ⏳ Tiempo estimado: <strong>${leg.duration.text}</strong>
         `;
         routeDetails.appendChild(li);
     });
 
     // Mostrar distancia y tiempo total
     const totalInfo = document.createElement("li");
+    totalInfo.className = "list-group-item list-group-item-info text-center fw-bold";
     totalInfo.innerHTML = `
-        <strong>Total de la ruta:</strong><br>
-        Distancia: ${(totalDistance / 1000).toFixed(2)} km<br>
-        Tiempo estimado: ${(totalTime / 60).toFixed(2)} minutos
+        <strong>📊 Total de la ruta:</strong> <br>
+        📏 Distancia: ${(totalDistance / 1000).toFixed(2)} km <br>
+        ⏳ Tiempo estimado: ${(totalTime / 60).toFixed(2)} minutos
     `;
     routeDetails.appendChild(totalInfo);
 }
-
 
 
     document.getElementById("calculateRoute").addEventListener("click", calculateOptimalRoute);
