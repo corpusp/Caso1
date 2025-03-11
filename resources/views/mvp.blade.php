@@ -7,6 +7,7 @@
     <form id="addTouristForm">
         <input type="text" id="nombre" placeholder="Nombre" required>
         <input type="text" id="direccion" placeholder="Dirección" required>
+        <input type="text" id="telefono" placeholder="Teléfono" required>
         <button type="submit">Añadir Turista</button>
     </form>
     
@@ -38,7 +39,7 @@
                         touristList.innerHTML = "";
                         data.forEach(tourist => {
                             const li = document.createElement("li");
-                            li.textContent = tourist.nombre + " - " + tourist.direccion;
+                            li.textContent = `${tourist.nombre} - ${tourist.direccion} - ${tourist.telefono}`;
                             const deleteBtn = document.createElement("button");
                             deleteBtn.textContent = "Eliminar";
                             deleteBtn.onclick = () => deleteTourist(tourist.id);
@@ -52,11 +53,12 @@
                 event.preventDefault();
                 const nombre = document.getElementById("nombre").value;
                 const direccion = document.getElementById("direccion").value;
+                const telefono = document.getElementById("telefono").value;
 
                 fetch("/api/tourists", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ nombre, direccion })
+                    body: JSON.stringify({ nombre, direccion, telefono })
                 }).then(() => {
                     loadTourists();
                     document.getElementById("addTouristForm").reset();
@@ -83,4 +85,5 @@
     </script>
 
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&callback=initMap" async defer></script>
+
 @endsection
