@@ -10,6 +10,11 @@ use App\Http\Controllers\ConductorController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
+
+Route::get('/', function () {
+    return view('welcome'); // O cualquier otra vista que tengas
+});
+
 Route::middleware(['auth'])->group(function () {
    
     Route::resource('usuarios', UsuarioController::class);
