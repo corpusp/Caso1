@@ -9,11 +9,15 @@ use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ConductorController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\MVPController;
 
 
 Route::get('/', function () {
-    return view('welcome'); // O cualquier otra vista que tengas
+    return view('mvp'); // O cualquier otra vista que tengas
 });
+
+Route::get('/mvp', [MVPController::class, 'index'])->name('mvp');
+
 
 Route::middleware(['auth'])->group(function () {
    
@@ -53,4 +57,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware('auth')->name('dashboard');
+
+
 
