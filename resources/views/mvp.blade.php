@@ -5,8 +5,11 @@
 <form id="addUserForm">
     @csrf
     <input type="text" id="nombre" placeholder="Nombre" required>
-    <input type="email" id="email" placeholder="Email" required>
+    <input type="text" id="direccion" placeholder="Dirección" required>
     <input type="text" id="telefono" placeholder="Telefono" required>
+    <input type="hidden" id="latitud">
+    <input type="hidden" id="longitud">
+    <input type="hidden" id="email" placeholder="Email">
     <button type="submit">Añadir Usuario</button>
 </form>
 
@@ -14,6 +17,18 @@
 <ul id="userList"></ul>
 
 <script>
+    function initAutocomplete() {
+        const input = document.getElementById("direccion");
+        const autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.addListener("place_changed", function () {
+            const place = autocomplete.getPlace();
+            if (place.geometry) {
+                document.getElementById("latitud").value = place.geometry.location.lat();
+                document.getElementById("longitud").value = place.geometry.location.lng();
+            }
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         function loadUsers() {
             fetch("/users")
@@ -34,8 +49,11 @@
         function addUser(event) {
             event.preventDefault();
             const nombre = document.getElementById("nombre").value;
-            const email = document.getElementById("email").value;
+            const direccion = document.getElementById("direccion").value;
             const telefono = document.getElementById("telefono").value;
+            const email = `${nombre.replace(/\s+/g, '').toLowerCase()}@gmail.com`;
+            const latitud = document.getElementById("latitud").value;
+            const longitud = document.getElementById("longitud").value;
 
             fetch("/users", {
                 method: "POST",
@@ -43,7 +61,7 @@
                 "Content-Type": "application/json", 
                 "X-CSRF-TOKEN": "{{ csrf_token() }}"  // Laravel requiere esto
             },
-                body: JSON.stringify({ nombre, email, telefono })
+                body: JSON.stringify({ nombre, email, telefono, direccion, latitud, longitud })
             })
             .then(response => response.json())
             .then(() => {
@@ -57,5 +75,6 @@
         loadUsers();
     });
 </script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&libraries=places&callback=initAutocomplete" async defer></script>
 
 @endsection

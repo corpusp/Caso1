@@ -24,6 +24,9 @@ class MVPController extends Controller
             'nombre' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:usuarios',
             'telefono' => 'required|string|max:20',
+            'direccion' => 'required|string',
+            'latitud' => 'required|numeric',
+            'longitud' => 'required|numeric',
         ]);
         
         $usuario = Usuario::create([
@@ -31,9 +34,9 @@ class MVPController extends Controller
             'email' => $request->email,
             'password' => Hash::make('123456'), // Generamos una contraseña por defecto
             'telefono' => $request->telefono,
-            'direccion' => 'micasa',
-            'latitud' => -12.11325900,
-            'longitud' => -76.95542436,
+            'direccion' => $request->direccion,
+            'latitud' => $request->latitud,
+            'longitud' => $request->longitud,
         ]);
         
 
