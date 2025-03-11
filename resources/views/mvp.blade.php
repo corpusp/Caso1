@@ -97,7 +97,7 @@
     function initAutocomplete() {
         const input = document.getElementById("direccion");
         autocomplete = new google.maps.places.Autocomplete(input, {
-            types: ["geocode"], // 🔥 Filtrar solo direcciones
+            types: ["establishment", "geocode"], // 🔥 Permite buscar direcciones y negocios
             componentRestrictions: { country: "PE" } // Opcional: restringir a Perú
         });
 
@@ -255,23 +255,45 @@ function showRouteDetails(result, users) {
     let totalDistance = 0;
     let totalTime = 0;
 
+    // Obtener el orden optimizado de los waypoints
+    const waypointOrder = result.routes[0].waypoint_order;
+
+    // Agregar inicio (Centro de Lima)
+    const inicioLi = document.createElement("li");
+    inicioLi.className = "list-group-item list-group-item-secondary text-center fw-bold";
+    inicioLi.innerHTML = `<strong>🟢 Inicio: Centro de Lima</strong>`;
+    routeDetails.appendChild(inicioLi);
+
+    // Iterar sobre las etapas de la ruta y mostrar en el orden optimizado
     route.legs.forEach((leg, index) => {
         totalDistance += leg.distance.value;
         totalTime += leg.duration.value;
 
+        let user = { nombre: "Destino Final", direccion: "Parque de las Aguas" };
+        
+        // Si es un punto intermedio (no el destino final)
+        if (index < waypointOrder.length) {
+            const userIndex = waypointOrder[index]; // Obtener el índice optimizado
+            user = users[userIndex]; // Obtener el usuario correcto
+        }
+
         const li = document.createElement("li");
         li.className = "list-group-item";
 
-        const user = users[index] ? users[index] : { nombre: "Destino Final", direccion: "Parque de las Aguas" };
-        
         li.innerHTML = `
-            <strong>🧑 ${index + 1}. ${user.nombre}</strong> <br>
+            <strong>🚶 ${index + 1}. ${user.nombre}</strong> <br>
             📍 <em>${user.direccion}</em> <br>
             📏 Distancia: <strong>${leg.distance.text}</strong> <br>
             ⏳ Tiempo estimado: <strong>${leg.duration.text}</strong>
         `;
         routeDetails.appendChild(li);
     });
+
+    // Agregar destino final
+    const destinoLi = document.createElement("li");
+    destinoLi.className = "list-group-item list-group-item-primary text-center fw-bold";
+    destinoLi.innerHTML = `<strong>🔵 Destino: Parque de las Aguas</strong>`;
+    routeDetails.appendChild(destinoLi);
 
     // Mostrar distancia y tiempo total
     const totalInfo = document.createElement("li");
