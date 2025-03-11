@@ -13,6 +13,11 @@ class MVPController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function getUsers()
+    {
+        return response()->json(Usuario::all());
+    }
+    
     public function index()
     {
         $reservas = Reserva::with('usuario', 'tour', 'horario')->get();
