@@ -16,8 +16,8 @@ Este proyecto es una aplicación web desarrollada con **Laravel, JavaScript y Bo
 
 ### 1️⃣ Clonar el repositorio  
 ```bash
-git clone https://github.com/tu-usuario/tu-repositorio.git
-cd tu-repositorio
+git clone https://github.com/corpusp/Caso1.git
+cd Caso1
 ```
 2️⃣ Instalar dependencias
 ```bash
@@ -67,6 +67,12 @@ Abre tu navegador en http://127.0.0.1:8000 🚀
 4️⃣ Presiona el botón **"Calcular Ruta Óptima"** para obtener el mejor recorrido.  
 
 5️⃣ La ruta se mostrará en el mapa con detalles de distancia y tiempo estimado.  
+
+## 🌍 Enlace a la Aplicación  
+🔗 **URL de la aplicación en producción:** [caso1-production.up.railway.app](https://caso1-production.up.railway.app)  
+
+### 📸 Captura de pantalla  
+![Vista previa de la aplicación](public/screenshots/captura.png)
 
 
 ## 🛠️ Tecnologías Utilizadas
