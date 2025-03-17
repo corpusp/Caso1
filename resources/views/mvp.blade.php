@@ -96,22 +96,48 @@
 
     function initAutocomplete() {
         const input = document.getElementById("direccion");
+
+        // Definir los límites geográficos de Lima
+        const limaBounds = new google.maps.LatLngBounds(
+            { lat: -12.5, lng: -77.2 }, // Suroeste de Lima
+            { lat: -11.8, lng: -76.8 }  // Noreste de Lima
+        );
+
         autocomplete = new google.maps.places.Autocomplete(input, {
-            types: ["establishment", "geocode"], // 🔥 Permite buscar direcciones y negocios
-            componentRestrictions: { country: "PE" } // Opcional: restringir a Perú
+            types: ["establishment","geocode"], // Solo direcciones y negocioszz
+            componentRestrictions: { country: "PE" }, // Restringir a Perú
+            bounds: limaBounds, // Limitar la búsqueda a Lima
+            strictBounds: true  // Solo mostrar resultados dentro de los bounds
         });
 
         autocomplete.addListener("place_changed", function () {
             const place = autocomplete.getPlace();
-            if (place.geometry) {
-                document.getElementById("latitud").value = place.geometry.location.lat();
-                document.getElementById("longitud").value = place.geometry.location.lng();
-                console.log("Ubicación seleccionada:", place.formatted_address);
-            } else {
+            if (!place.geometry) {
                 console.warn("No se encontró una ubicación válida.");
+                return;
             }
+
+            let esLima = false;
+            place.address_components.forEach(component => {
+                if (component.types.includes("administrative_area_level_1") && component.long_name.includes("Lima")) {
+                    esLima = true;
+                }
+            });
+
+            if (!esLima) {
+                alert("Solo se permiten direcciones dentro de Lima.");
+                input.value = ""; // Limpiar la dirección si no es de Lima
+                return;
+            }
+
+            document.getElementById("latitud").value = place.geometry.location.lat();
+            document.getElementById("longitud").value = place.geometry.location.lng();
+
+            console.log("Ubicación seleccionada:", place.formatted_address);
         });
+
     }
+
 
     function addMarker(position, title, color = "red") {
         const marker = new google.maps.Marker({
