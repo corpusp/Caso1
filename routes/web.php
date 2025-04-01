@@ -7,6 +7,7 @@ use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ConductorController;
+use App\Http\Controllers\DireccionController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\MVPController;
@@ -41,6 +42,8 @@ Route::middleware(['auth'])->group(function () {
     
     // CRUD de conductores
     Route::resource('conductores', ConductorController::class);
+
+    Route::resource('direcciones', DireccionController::class);
 });
 
 Route::middleware(['auth'])->get('/menu', function () {

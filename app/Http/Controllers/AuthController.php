@@ -17,7 +17,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
+            'nombre' => 'required|string|max:255',
             'password' => 'required',
         ]);
 
@@ -26,7 +26,7 @@ class AuthController extends Controller
             return redirect()->route('menu')->with('user', $user);
         }
 
-        return back()->withErrors(['email' => 'Credenciales incorrectas']);
+        return back()->withErrors(['nombre' => 'Credenciales incorrectas']);
     }
 
     public function showRegister()
@@ -38,7 +38,6 @@ class AuthController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:usuarios',
             'password' => 'required|string|min:6|confirmed',
             'telefono' => 'required|string|max:20',
             'direccion' => 'required|string',
@@ -48,7 +47,6 @@ class AuthController extends Controller
 
         $usuario = Usuario::create([
             'nombre' => $request->nombre,
-            'email' => $request->email,
             'password' => Hash::make($request->password),
             'telefono' => $request->telefono,
             'direccion' => $request->direccion,

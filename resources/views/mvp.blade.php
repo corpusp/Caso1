@@ -22,7 +22,6 @@
                         </div>
                         <input type="hidden" id="latitud">
                         <input type="hidden" id="longitud">
-                        <input type="hidden" id="email">
                         <button type="submit" class="btn btn-primary w-100">Añadir Usuario</button>
                     </form>
                 </div>
@@ -68,6 +67,7 @@
 
 
 <script>
+
     let map, directionsService, directionsRenderer, autocomplete;
     const origin = { lat: -12.0464, lng: -77.0428 };
     const destination = { lat: -12.0681, lng: -77.0330 };
@@ -169,7 +169,7 @@
                 li.innerHTML = `
                     <div>
                         <strong>${user.nombre}</strong> <br>
-                        📍 ${user.direccion} <br>
+                        📍 ${user.direccion ? user.direccion.direccion : 'Sin dirección'} <br>  <!-- Usar user.direccion.direccion -->
                         📞 ${user.telefono}
                     </div>
                     <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">
@@ -178,20 +178,20 @@
                 `;
                 userList.appendChild(li);
 
-                if (user.latitud && user.longitud) {
-                    addMarker({ lat: parseFloat(user.latitud), lng: parseFloat(user.longitud) }, user.nombre);
+                if (user.direccion.latitud && user.direccion.longitud) {
+                    addMarker({ lat: parseFloat(user.direccion.latitud), lng: parseFloat(user.direccion.longitud) }, user.nombre);
                 }
             });
         })
         .catch(error => console.error("Error al cargar usuarios:", error));
 }
 
+
     function addUser(event) {
         event.preventDefault();
         const nombre = document.getElementById("nombre").value;
         const direccion = document.getElementById("direccion").value;
         const telefono = document.getElementById("telefono").value;
-        const email = `${nombre.replace(/\s+/g, '').toLowerCase()}@gmail.com`;
         const latitud = document.getElementById("latitud").value;
         const longitud = document.getElementById("longitud").value;
 
@@ -206,9 +206,14 @@
                 "Content-Type": "application/json", 
                 "X-CSRF-TOKEN": "{{ csrf_token() }}" 
             },
-            body: JSON.stringify({ nombre, email, telefono, direccion, latitud, longitud })
+            body: JSON.stringify({ nombre, telefono, direccion, latitud, longitud })
         })
-        .then(response => response.json())
+        .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al añadir usuario');
+        }
+        return response.json();
+        })
         .then(() => {
             loadUsers();
             document.getElementById("addUserForm").reset();
@@ -249,7 +254,7 @@
             }
 
             const waypoints = data.map(user => ({
-                location: new google.maps.LatLng(user.latitud, user.longitud),
+                location: new google.maps.LatLng(user.direccion.latitud, user.direccion.longitud),
                 stopover: true
             }));
 
@@ -308,7 +313,7 @@ function showRouteDetails(result, users) {
 
         li.innerHTML = `
             <strong>🚶 ${index + 1}. ${user.nombre}</strong> <br>
-            📍 <em>${user.direccion}</em> <br>
+            📍 <em>${user.direccion.direccion}</em> <br>
             📏 Distancia: <strong>${leg.distance.text}</strong> <br>
             ⏳ Tiempo estimado: <strong>${leg.duration.text}</strong>
         `;

@@ -9,12 +9,8 @@ return new class extends Migration {
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 100);
-            $table->string('email', 100)->unique();
             $table->string('password');
             $table->string('telefono', 20)->nullable();
-            $table->text('direccion')->nullable();
-            $table->decimal('latitud', 10, 8);
-            $table->decimal('longitud', 11, 8);
             $table->timestamps();
         });
     }
