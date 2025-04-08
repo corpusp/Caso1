@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,13 +14,19 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="{{ route('menu') }}">Agencia de Tour</a>
+            @can('mvp')      
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
+                    @can('addUSer')
                     <li class="nav-item"><a class="nav-link" href="{{ route('usuarios.index') }}">Usuarios</a></li>
+                    @endcan
                     <li class="nav-item"><a class="nav-link" href="{{ route('reservas.index') }}">Reservas</a></li>
+                    @can('deleteUser')
                     <li class="nav-item"><a class="nav-link" href="{{ route('direcciones.index') }}">Añadir Direccion</a></li>
+                    @endcan
                 </ul>
             </div>
+            @endcan
         </div>
     </nav>
 

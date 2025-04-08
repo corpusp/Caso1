@@ -12,6 +12,9 @@ return new class extends Migration {
             $table->foreignId('tour_id')->constrained('tours')->onDelete('cascade');
             $table->foreignId('horario_id')->constrained('horarios')->onDelete('cascade');
             $table->enum('estado', ['pendiente', 'confirmada', 'cancelada'])->default('pendiente');
+            $table->string('direccion');
+            $table->decimal('latitud', 10, 8);
+            $table->decimal('longitud', 11, 8);
             $table->timestamps();
         });
     }

@@ -13,9 +13,8 @@
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
-                <th>Email</th>
                 <th>Teléfono</th>
-                <th>Dirección</th>
+                <th>Reservas</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -24,9 +23,12 @@
                 <tr>
                     <td>{{ $usuario->id }}</td>
                     <td>{{ $usuario->nombre }}</td>
-                    <td>{{ $usuario->email }}</td>
                     <td>{{ $usuario->telefono }}</td>
-                    <td>{{ $usuario->direccion }}</td>
+                    <td>
+                        @foreach ($usuario->reservas as $reserva)
+                            <p onclick="window.location='{{ route('reservas.show', $reserva) }}'" style="cursor: pointer;"><strong>Tour:</strong> {{ $reserva->tour->nombre }} - <strong>Horario:</strong> {{ $reserva->horario->hora_salida }}</p>
+                        @endforeach
+                    </td>
                     <td>
                         <a href="{{ route('usuarios.edit', $usuario) }}" class="btn btn-warning btn-sm">Editar</a>
                         <form action="{{ route('usuarios.destroy', $usuario) }}" method="POST" class="d-inline">

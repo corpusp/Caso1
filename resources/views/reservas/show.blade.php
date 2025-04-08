@@ -6,7 +6,8 @@
     <p><strong>Usuario:</strong> {{ $reserva->usuario->nombre }}</p>
     <p><strong>Tour:</strong> {{ $reserva->tour->nombre }}</p>
     <p><strong>Horario:</strong> {{ $reserva->horario->hora_salida }}</p>
-    <p><strong>Fecha:</strong> {{ $reserva->fecha_reserva }}</p>
+    <p><strong>Fecha:</strong> {{ $reserva->created_at }}</p>
+    <p><strong>Direccion:</strong> {{ $reserva->direccion }}</p>
 
     <div id="map" style="height: 500px; width: 100%;"></div>
 
@@ -23,19 +24,32 @@
     const waypoints = [];
 
     @foreach ($usuarios as $usuario)
+    @php
+        // Filtrar la reserva del usuario que coincida con fecha, horario y tour
+        $reservaUsuario = $usuario->reservas->firstWhere(function($reserva) use ($reservaReferencia) {
+            return $reserva->fecha_reserva == $reservaReferencia->fecha_reserva &&
+                   $reserva->horario_id == $reservaReferencia->horario_id &&
+                   $reserva->tour_id == $reservaReferencia->tour_id;
+        });
+    @endphp
+
+    @if ($reservaUsuario && $reservaUsuario->latitud && $reservaUsuario->longitud)
         waypoints.push({
-            location: new google.maps.LatLng({{ $usuario->latitud }}, {{ $usuario->longitud }}),
+            location: new google.maps.LatLng({{ $reservaUsuario->latitud }}, {{ $reservaUsuario->longitud }}),
             stopover: true
         });
 
-        // Agregar marcador para cada usuario
         new google.maps.Marker({
-            position: { lat: {{ $usuario->latitud }}, lng: {{ $usuario->longitud }} },
+            position: { lat: {{ $reservaUsuario->latitud }}, lng: {{ $reservaUsuario->longitud }} },
             map: map,
             title: "{{ $usuario->nombre }}",
             icon: "{{ Auth::id() === $usuario->id ? 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png' : '' }}"
         });
-    @endforeach
+    @endif
+@endforeach
+
+
+
 
     const directionsService = new google.maps.DirectionsService();
     const directionsRenderer = new google.maps.DirectionsRenderer({

@@ -9,10 +9,10 @@ class Reserva extends Model {
     use HasFactory;
 
     protected $table = 'reservas';
-    protected $fillable = ['usuario_id', 'tour_id', 'horario_id', 'estado'];
+    protected $fillable = ['usuario_id', 'tour_id', 'horario_id', 'estado', 'direccion', 'latitud', 'longitud'];
 
     public function usuario() {
-        return $this->belongsTo(Usuario::class);
+        return $this->belongsTo(Usuario::class, 'usuario_id');
     }
 
     public function tour() {

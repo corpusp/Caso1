@@ -40,19 +40,15 @@ class AuthController extends Controller
             'nombre' => 'required|string|max:255',
             'password' => 'required|string|min:6|confirmed',
             'telefono' => 'required|string|max:20',
-            'direccion' => 'required|string',
-            'latitud' => 'required|numeric',
-            'longitud' => 'required|numeric',
         ]);
 
         $usuario = Usuario::create([
             'nombre' => $request->nombre,
             'password' => Hash::make($request->password),
             'telefono' => $request->telefono,
-            'direccion' => $request->direccion,
-            'latitud' => $request->latitud,
-            'longitud' => $request->longitud,
         ]);
+
+        $usuario->assignRole('Cliente');
 
         return redirect()->route('login')->with('success', 'Registro exitoso. Por favor, inicia sesión.');
     }

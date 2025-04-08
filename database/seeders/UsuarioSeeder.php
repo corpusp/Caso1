@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Usuario;
 use App\Models\Direccion;
 
+
 class UsuarioSeeder extends Seeder
 {
     /**
@@ -16,30 +17,27 @@ class UsuarioSeeder extends Seeder
         // Crear usuarios
         $usuario1 = Usuario::create([
             'nombre' => 'Pepe',
-            'email' => 'pepe@gmail.com',
             'password' => bcrypt('123456'),
             'telefono' => '123456789',
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ])->assignRole('Admin');
 
         $usuario2 = Usuario::create([
             'nombre' => 'Maria',
-            'email' => 'maria@gmail.com',
             'password' => bcrypt('123456'),
             'telefono' => '987654321',
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ])->assignRole('Cliente');;
 
         $usuario3 = Usuario::create([
             'nombre' => 'Juan',
-            'email' => 'juan@gmail.com',
             'password' => bcrypt('123456'),
             'telefono' => '987655555',
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ])->assignRole('Cliente');;
 
         // Crear direcciones para los usuarios
         Direccion::create([
